@@ -1,5 +1,4 @@
 #!/bin/sh
-#TODO.md
 
 dpkg_check_lock() {
   while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do
@@ -13,15 +12,26 @@ apt_install() {
     -o DPkg::Options::=--force-confold -o DPkg::Options::=--force-confdef "$@"
 }
 
-if [ -f /etc/debian_version ] || grep -qi ubuntu /etc/lsb-release || grep -qi ubuntu /etc/os-release; then
+if grep -qi ubuntu /etc/lsb-release || grep -qi ubuntu /etc/os-release; then
   
   # Add PPA Ansible repo
   apt-add-repository ppa:ansible/ansible -y
   dpkg_check_lock && apt-get update -q
+fi
+
+if [ -f /etc/debian_version ]; then
+   if [ -f /etc/apt/sources.list ]; then
+      echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" >> /etc/apt/sources.list
+      apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+      apt update
+      apt_install ansible
+   fi
+
+fi
+
   # Install required Python libs and pip
   apt_install python-pip python-yaml python-jinja2 python-httplib2 python-netaddr python-paramiko python-pkg-resources libffi-dev
-  [ -n "$( dpkg_check_lock && apt-cache search python-keyczar )" ] && apt_install python-keyczar
-  
+  [ -n "$( dpkg_check_lock && apt-cache search python-keyczar )" ] && apt_install python-keyczar  
   dpkg_check_lock && apt-cache search ^git$ | grep -q "^git\s" && apt_install git || apt_install git-core
   # If python-pip install failed and setuptools exists, try that
   if [ -z "$(which pip)" ] && [ -z "$(which easy_install)" ]; then
@@ -41,4 +51,3 @@ if [ -f /etc/debian_version ] || grep -qi ubuntu /etc/lsb-release || grep -qi ub
     # Install Ansible module dependencies
     apt_install bzip2 file findutils git gzip mercurial procps subversion sudo tar debianutils unzip xz-utils zip python-selinux python-boto
     apt_install ansible
-fi
