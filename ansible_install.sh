@@ -39,5 +39,6 @@ if [ -f /etc/debian_version ] || grep -qi ubuntu /etc/lsb-release || grep -qi ub
 
     # Install Ansible module dependencies
     apt_install bzip2 file findutils git gzip mercurial procps subversion sudo tar debianutils unzip xz-utils zip python-selinux python-boto
-
+    apt-add-repository ppa:ansible/ansible -y
+    apt_install ansible
 fi
