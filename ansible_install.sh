@@ -15,8 +15,9 @@ apt_install() {
 
 if [ -f /etc/debian_version ] || grep -qi ubuntu /etc/lsb-release || grep -qi ubuntu /etc/os-release; then
   
+  # Add PPA Ansible repo
+  apt-add-repository ppa:ansible/ansible -y
   dpkg_check_lock && apt-get update -q
-  
   # Install required Python libs and pip
   apt_install python-pip python-yaml python-jinja2 python-httplib2 python-netaddr python-paramiko python-pkg-resources libffi-dev
   [ -n "$( dpkg_check_lock && apt-cache search python-keyczar )" ] && apt_install python-keyczar
@@ -39,6 +40,5 @@ if [ -f /etc/debian_version ] || grep -qi ubuntu /etc/lsb-release || grep -qi ub
 
     # Install Ansible module dependencies
     apt_install bzip2 file findutils git gzip mercurial procps subversion sudo tar debianutils unzip xz-utils zip python-selinux python-boto
-    apt-add-repository ppa:ansible/ansible -y
     apt_install ansible
 fi
