@@ -81,7 +81,7 @@
              
        - name: add Repo
          shell:
-            cmd: echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" > /etc/apt/sources.list.d/docker.list
+            cmd: echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(. /etc/os-release; echo "$UBUNTU_CODENAME") stable" > /etc/apt/sources.list.d/docker.list
          become: true
 
        - name: install docker
